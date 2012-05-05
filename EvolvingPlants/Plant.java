@@ -9,7 +9,8 @@ import TroysCode.hub;
 
 public class Plant extends PlantPart
 	{
-		public Plant parent;
+		protected Plant parentOne;
+		protected Plant parentTwo;
 
 		public int age = 0;
 
@@ -26,28 +27,32 @@ public class Plant extends PlantPart
 		Color leafColour;
 		Color seedColour;
 
-		public Plant(Plant parentPlant, float x, float y)
+		public Plant(Plant parentOne, Plant parentTwo, float x, float y)
 			{
 				// null because thisPlant != parentPlant (it's == this)
 				super(null, x, y);
-				parent = parentPlant;
+				this.parentOne = parentOne;
+				this.parentTwo = parentTwo;
 				thisPlant = this;
 
-				genes = new Genes(parentPlant, this);
+				genes = new Genes(parentOne, parentTwo, this);
 
 				leafColour = genes.leafColour;
 				seedColour = genes.seedColour;
 
 				seed = new Seed(this, x, y);
-				seed.energy = genes.seedEnergy;
+				if (parentOne != null)
+					seed.energy = parentOne.genes.seedEnergy;
 
 				numberOfStemsLeft = (int) genes.maxStems;
 			}
 
-		public Plant(Plant parentPlant, float x, float y, Genes genes)
+		public Plant(Plant parentOne, Plant parentTwo, float x, float y, Genes genes)
 			{
-				super(null , x, y);
-				parent = this;
+				// null because thisPlant != parentPlant (it's == this)
+				super(null, x, y);
+				this.parentOne = parentOne;
+				this.parentTwo = parentTwo;
 				thisPlant = this;
 
 				this.genes = genes;

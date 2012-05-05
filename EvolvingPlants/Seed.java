@@ -12,15 +12,17 @@ public class Seed extends PlantPart
 		public boolean germinated = false;
 
 		double xMod = 0;
-		
+
 		private double energyPerGrow;
 
 		public Seed(Plant thisPlant, float x, float y)
 			{
 				super(thisPlant, x, y);
 
-				energyPerGrow = thisPlant.genes.stemGrowSpeed * Math.pow(thisPlant.genes.stemGrowSpeed + 0.2, 1.25);
+				energy = thisPlant.genes.seedEnergy;
 				
+				energyPerGrow = thisPlant.genes.energyTransfer * Math.pow(thisPlant.genes.energyTransfer + 0.2, 1.25);
+
 				xMod = Tools.randDouble(-thisPlant.genes.seedSpread, thisPlant.genes.seedSpread);
 			}
 
@@ -87,7 +89,11 @@ public class Seed extends PlantPart
 						if (thisPlant.genes.germinate && hub.world.isSpaceToGerminate(thisPlant))
 							{
 								germinated = true;
-								thisPlant.parent.numGerminatedOffspring++;
+								if (thisPlant.parentOne != null && thisPlant.parentTwo != null)
+									{
+										thisPlant.parentOne.numGerminatedOffspring++;
+										thisPlant.parentTwo.numGerminatedOffspring++;
+									}
 
 								int numStems = (int) Math.min(thisPlant.numberOfStemsLeft, thisPlant.genes.numberOfSeedStems);
 								stems = new Stem[numStems];

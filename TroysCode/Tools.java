@@ -107,8 +107,8 @@ public class Tools
 		 *            - the lower end of the return range
 		 * @param high
 		 *            - the upper end of the return range
-		 * @return A long greater than or equal to the low parameter, and
-		 *         less than or equal to the high parameter.
+		 * @return A long greater than or equal to the low parameter, and less
+		 *         than or equal to the high parameter.
 		 */
 		public static final long randLong(long low, long high)
 			{
@@ -216,6 +216,12 @@ public class Tools
 				return new Color(red, green, blue, alpha);
 			}
 
+		public static Color interpolateColours(Color colOne, Color colTwo)
+			{
+				return new Color(((colOne.getRed() + colTwo.getRed()) / 2), ((colOne.getGreen() + colTwo.getGreen()) / 2),
+						((colOne.getBlue() + colTwo.getBlue()) / 2), ((colOne.getAlpha() + colTwo.getAlpha()) / 2));
+			}
+
 		/**
 		 * This method calculates the vector between two points.
 		 * 
@@ -273,8 +279,8 @@ public class Tools
 		 * accuracy.
 		 * 
 		 * @param vectorAngle
-		 *            - The angle in degrees, which the line is pointing, 0 is North, 90
-		 *            is East, 180 is South and 360 is North again.
+		 *            - The angle in degrees, which the line is pointing, 0 is
+		 *            North, 90 is East, 180 is South and 360 is North again.
 		 * @param vectorLength
 		 *            - The.
 		 * @return A {@link TPoint} Representing a vector of length
@@ -284,7 +290,7 @@ public class Tools
 		public static final TPoint getVector(double vectorAngle, double vectorLength)
 			{
 				TPoint point = new TPoint(0, 0);
-				
+
 				double vectorAngleRadians = Math.toRadians(vectorAngle);
 
 				double x = Math.sin(vectorAngleRadians) * vectorLength;

@@ -16,7 +16,7 @@ public class Stem extends PlantPart
 
 		private double growX;
 		private double growY;
-		
+
 		private double energyPerGrow;
 
 		public Stem(Plant thisPlant, float x, float y)
@@ -25,7 +25,7 @@ public class Stem extends PlantPart
 				tipX = x;
 				tipY = y;
 
-				energyPerGrow = thisPlant.genes.stemGrowSpeed * Math.pow(thisPlant.genes.stemGrowSpeed + 0.2, 1.25);
+				energyPerGrow = thisPlant.genes.energyTransfer * Math.pow(thisPlant.genes.energyTransfer + 0.2, 1.25);
 				calculateGrowthPath();
 
 				leaf = new Leaf(thisPlant, tipX, tipY);
@@ -40,8 +40,8 @@ public class Stem extends PlantPart
 				else
 					growAngle += (hub.world.rightWindFactor * 10.0) / (y / 200);
 				
-				TPoint growVector = Tools.getVector(growAngle, thisPlant.genes.stemGrowSpeed);
-				
+				TPoint growVector = Tools.getVector(growAngle, thisPlant.genes.energyTransfer);
+
 				growX = growVector.getX();
 				growY = growVector.getY();
 			}
@@ -51,12 +51,12 @@ public class Stem extends PlantPart
 				return (int) Tools.getVectorLength(x, y, tipX, tipY);
 			}
 
-		private final void grow(PlantPart energyFrom)
+		private final void grow()
 			{
 				tipY -= growY;
 				tipX += growX;
 				leaf.move(growX, growY);
-				energyFrom.energy -= energyPerGrow;
+				energy -= energyPerGrow;
 			}
 
 		protected final void move(double xMod, double yMod)
@@ -74,14 +74,19 @@ public class Stem extends PlantPart
 				if (totatStemLength() < thisPlant.genes.maxStemLength)
 					{
 						if (energy > energyPerGrow)
-							grow(this);
+							grow();
+
 						else if (leaf.energy > energyPerGrow)
-							grow(leaf);
+							{
+								leaf.energy -= energyPerGrow;
+								energy += energyPerGrow;
+								grow();
+							}
 					}
-				else if (energy > 1)
+				else if (energy > thisPlant.genes.energyTransfer)
 					{
-						leaf.energy++;
-						energy--;
+						leaf.energy += thisPlant.genes.energyTransfer;
+						energy -= thisPlant.genes.energyTransfer;
 					}
 
 				leaf.tick();

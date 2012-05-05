@@ -76,13 +76,13 @@ public class World extends RenderableObject implements Constants
 		private Plant selectedPlant;
 
 		private final TButton reColourButton = new TButton(5, 30, "Re-Colour");
-		private final TButton reColourRelativesButton = new TButton(75, 30, "Re-Colour Relatives");
+		private final TButton reColourSpeciesButton = new TButton(75, 30, "Re-Colour Species");
 		private final TButton showRelationsButton = new TButton(100, 3, "Show Relation");
 
 		// Genes options
 		private byte selectedSlider = NONE;
 
-		private Genes currentGenes = new Genes(null, null);
+		private Genes currentGenes = new Genes(null, null, null);
 
 		private final TButton getGenesButton = new TButton(65, 190, "Get Genes from Plant");
 
@@ -160,7 +160,7 @@ public class World extends RenderableObject implements Constants
 
 				// Plant components
 				addTComponent(reColourButton);
-				addTComponent(reColourRelativesButton);
+				addTComponent(reColourSpeciesButton);
 				addTComponent(showRelationsButton);
 
 				// Genes Components
@@ -195,7 +195,7 @@ public class World extends RenderableObject implements Constants
 				for (int i = 0; i < 10; i++)
 					for (int tries = 0; tries < 5; tries++)
 						{
-							Plant p = new Plant(new Plant(new Plant(null, (i * 80) + 240, 500), (i * 80) + 240, 500), (i * 80) + 240, 500);
+							Plant p = new Plant(null, null, (i * 80) + 240, 500);
 							addPlant(p);
 						}
 
@@ -288,22 +288,21 @@ public class World extends RenderableObject implements Constants
 				if (showRelations && selectedPlant != null)
 					{
 						g.setColor(Color.WHITE);
-						g.fillRect(200, 70, 800, 25);
-						for (Plant p : plants)
+						g.fillRect(200, 70, 800, 100);
+
+						g.setColor(Color.BLUE);
+						g.drawLine(200, 70 + (Genes.SPECIES_VAR * 3), 1000, 70 + (Genes.SPECIES_VAR * 3));
+					}
+
+				for (Plant p : plants)
+					{
+						p.render(g);
+						if (showRelations && selectedPlant != null && p.seed.germinated)
 							{
-								p.render(g);
-								if (p.seed.germinated && isRelated(p))
-									{
-										g.setColor(Color.BLACK);
-										g.drawString("*", Math.round(p.x), 88);
-									}
+								g.setColor(Color.BLACK);
+								g.drawString("*", Math.round(p.x), 80 + (int) (p.genes.getSpeciesDifference(selectedPlant) / 0.3));
 							}
 					}
-				else
-					for (Plant p : plants)
-						{
-							p.render(g);
-						}
 
 				if (selectedSlider != NONE)
 					{
@@ -446,7 +445,7 @@ public class World extends RenderableObject implements Constants
 										}
 							break;
 						case PLANT:
-							addPlant(new Plant(new Plant(null, event.getX(), event.getY(), currentGenes), event.getX(), event.getY(), currentGenes));
+							addPlant(new Plant(null, null, event.getX(), event.getY(), currentGenes));
 							break;
 						case KILL:
 							for (Plant p : plants)
@@ -521,7 +520,7 @@ public class World extends RenderableObject implements Constants
 
 				if (event.getY() > 70)
 					if (mouseState == KILL)
-						for (Plant p : plants)
+						for (Plant p : getPlants())
 							for (Leaf l : p.leaves)
 								if (l.containsPoint(event.getX(), event.getY()))
 									{
@@ -588,7 +587,7 @@ public class World extends RenderableObject implements Constants
 							}
 					}
 
-				else if (event.getSource() == reColourRelativesButton)
+				else if (event.getSource() == reColourSpeciesButton)
 					{
 						if (selectedPlant != null)
 							{
@@ -597,7 +596,14 @@ public class World extends RenderableObject implements Constants
 								selectedPlant.leafColour = new Color(c.getRed(), c.getGreen(), c.getBlue(), selectedPlant.genes.leafColour.getAlpha());
 
 								for (Plant p : plants)
-									if (isRelated(p))
+									if (p.genes.isSameSpecies(selectedPlant))
+										{
+											p.genes.leafColour = selectedPlant.genes.leafColour;
+											p.leafColour = selectedPlant.genes.leafColour;
+										}
+
+								for (Plant p : plantsToAdd)
+									if (p.genes.isSameSpecies(selectedPlant))
 										{
 											p.genes.leafColour = selectedPlant.genes.leafColour;
 											p.leafColour = selectedPlant.genes.leafColour;
@@ -653,24 +659,6 @@ public class World extends RenderableObject implements Constants
 				selectedPlant.selected = true;
 			}
 
-		private final boolean isRelated(Plant p)
-			{
-				// if is parent or grandParent of selected plant
-				if (p == selectedPlant.parent || p == selectedPlant.parent.parent)
-					return true;
-
-				// if is child or sibling or Aunt/Uncle of selected plant
-				if (p.parent == selectedPlant || p.parent == selectedPlant.parent || p.parent == selectedPlant.parent.parent)
-					return true;
-
-				// if is great grandChild, or niece/nephew or cousin of selected
-				// plant
-				if (p.parent.parent == selectedPlant || p.parent.parent == selectedPlant.parent || p.parent.parent == selectedPlant.parent.parent)
-					return true;
-
-				return false;
-			}
-
 		private final void setGeneSliders()
 			{
 				Genes g = currentGenes;
@@ -681,9 +669,16 @@ public class World extends RenderableObject implements Constants
 				stemsPerLeafSlider.setSliderPercent(g.numberOfLeafStems / 0.15f);
 				chanceGrowingStemsSlider.setSliderPercent(g.chanceOfGrowingStems);
 				maxStemsSlider.setSliderPercent((g.maxStems - 1) / 0.29f);
-				stemAngleVarSlider.setSliderPercent(g.stemAngleVariation / 1.8f);
+				stemAngleVarSlider.setSliderPercent(g.stemAngleVariation / 1.80);
 				seedEnergySlider.setSliderPercent(g.seedEnergy / 5);
 				alphaValueSlider.setSliderPercent((255 - g.leafColour.getAlpha()) / 2.55f);
+			}
+
+		protected synchronized final Plant[] getPlants()
+			{
+				Plant[] plants = new Plant[this.plants.size()];
+				this.plants.toArray(plants);
+				return plants;
 			}
 
 		@Override
@@ -704,6 +699,32 @@ public class World extends RenderableObject implements Constants
 		@Override
 		protected void mouseClicked(MouseEvent event)
 			{
+				if (event.getX() < 200)
+					{
+						if (maxAgeSlider.containsPoint(event.getPoint()))
+							selectedSlider = MAX_AGE;
+
+						else if (stemsPerSeedSlider.containsPoint(event.getPoint()))
+							selectedSlider = SEED_STEMS;
+
+						else if (stemsPerLeafSlider.containsPoint(event.getPoint()))
+							selectedSlider = LEAF_STEMS;
+
+						else if (chanceGrowingStemsSlider.containsPoint(event.getPoint()))
+							selectedSlider = CHANCE_STEMS;
+
+						else if (maxStemsSlider.containsPoint(event.getPoint()))
+							selectedSlider = MAX_STEMS;
+
+						else if (stemAngleVarSlider.containsPoint(event.getPoint()))
+							selectedSlider = STEM_ANGLE;
+
+						else if (seedEnergySlider.containsPoint(event.getPoint()))
+							selectedSlider = SEED_ENERGY;
+
+						else if (alphaValueSlider.containsPoint(event.getPoint()))
+							selectedSlider = LEAF_ALPHA;
+					}
 			}
 
 		@Override

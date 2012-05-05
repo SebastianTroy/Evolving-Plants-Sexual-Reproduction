@@ -23,10 +23,75 @@ public class Leaf extends PlantPart
 
 				this.x = tipX;
 				this.y = tipY;
-				
+
 				willGrowStems = thisPlant.genes.chanceOfGrowingStems > Tools.randPercent();
 
 				thisPlant.leaves.add(this);
+			}
+
+		protected final void move(double xMod, double yMod)
+			{
+				y -= yMod;
+				x += xMod;
+				if (stems != null)
+					for (Stem s : stems)
+						s.move(xMod, yMod);
+			}
+
+		private void growStems()
+			{
+				if (willGrowStems)
+					{
+						int numStems = Tools.randInt(0, (int) Math.min(thisPlant.numberOfStemsLeft, thisPlant.genes.numberOfLeafStems));
+						if (numStems == 0)
+							{
+								willGrowStems = false;
+								return;
+							}
+
+						stems = new Stem[numStems];
+						for (int i = 0; i < numStems; i++)
+							stems[i] = new Stem(thisPlant, x, y);
+						thisPlant.numberOfStemsLeft -= numStems;
+					}
+				else
+					willGrowStems = false;
+			}
+
+		public final boolean containsPoint(float x, float y)
+			{
+				return Tools.getVectorLength(this.x, this.y, x, y) < 12.5 ? true : false;
+			}
+
+		public void containsPhoton(Photon photon)
+			{
+				if (containsPoint(photon.x, photon.y))
+					{
+						float energyGainedFromLight = photon.energy * (thisPlant.genes.leafColour.getAlpha() / 255f);
+
+						energy += energyGainedFromLight;
+						photon.energy -= energyGainedFromLight;
+						if (photon.energy < 1)
+							photon.exists = false;
+					}
+			}
+
+		private final Plant findPartner()
+			{
+				Leaf closestLeaf = this;
+				double distanceToLeaf = 200;
+
+				for (Plant p : hub.world.getPlants())
+					if (p != thisPlant && p.genes.isGeneticallyCompatable(thisPlant))
+						for (Leaf leaf : p.leaves)
+							if (Tools.getVectorLength(leaf.x, leaf.y, this.x, this.y) < distanceToLeaf)
+								{
+									closestLeaf = leaf;
+									if (distanceToLeaf < 100 && Tools.randPercent() > 70)
+										break;
+								}
+
+				return closestLeaf.thisPlant;
 			}
 
 		@Override
@@ -41,11 +106,12 @@ public class Leaf extends PlantPart
 
 				if (energy > ENERGY_THRESHOLD)
 					{
-						seedEnergy += 3;
-						energy -= 3;
+						seedEnergy += thisPlant.genes.energyTransfer;
+						energy -= thisPlant.genes.energyTransfer;
 						if (seedEnergy > thisPlant.genes.seedEnergy)
 							{
-								hub.world.addPlant(new Plant(thisPlant, x, y));
+								Plant parentTwo = findPartner();
+								hub.world.addPlant(new Plant(thisPlant, parentTwo, x, y));
 								energy -= thisPlant.genes.seedEnergy;
 								seedEnergy = 0;
 							}
@@ -71,51 +137,12 @@ public class Leaf extends PlantPart
 						int seedSize = (int) (seedEnergy / 15);
 						g.fillOval(Math.round(x - (seedSize / 2)), Math.round(y - (seedSize / 2)), seedSize, seedSize);
 					}
-			}
 
-		protected final void move(double xMod, double yMod)
-		{
-			y -= yMod;
-			x += xMod;
-			if (stems != null)
-				for (Stem s : stems)
-					s.move(xMod, yMod);
-		}
-
-		private void growStems()
-		{
-			if (willGrowStems)
-				{
-					int numStems = Tools.randInt(0 , (int) Math.min(thisPlant.numberOfStemsLeft, thisPlant.genes.numberOfLeafStems));
-					if (numStems == 0)
+				if (hub.DEBUG)
+					if (thisPlant.selected)
 						{
-							willGrowStems = false;
-							return;
+							g.setColor(Color.BLACK);
+							g.drawString("" + thisPlant.genes.DNA, Math.round(x - 12.5f), Math.round(y - 12.5f));
 						}
-					stems = new Stem[numStems];
-					for (int i = 0; i < numStems; i++)
-						stems[i] = new Stem(thisPlant, x, y);
-					thisPlant.numberOfStemsLeft -= numStems;
-				}
-			else
-				willGrowStems = false;
-		}
-
-		public final boolean containsPoint(float x, float y)
-			{
-				return Tools.getVectorLength(this.x, this.y, x, y) < 12.5 ? true : false;
-			}
-
-		public void containsPhoton(Photon photon)
-			{
-				if (containsPoint(photon.x, photon.y))
-					{
-						float energyGainedFromLight = photon.energy * (thisPlant.genes.leafColour.getAlpha() / 255f);
-
-						energy += energyGainedFromLight;
-						photon.energy -= energyGainedFromLight;
-						if (photon.energy < 1)
-							photon.exists = false;
-					}
 			}
 	}
