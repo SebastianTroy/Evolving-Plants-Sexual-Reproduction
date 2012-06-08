@@ -2,7 +2,6 @@ package EvolvingPlants;
 
 import java.awt.Color;
 import java.awt.Graphics;
-
 import TroysCode.Tools;
 import TroysCode.hub;
 
@@ -15,6 +14,8 @@ public class Leaf extends PlantPart
 		private double seedEnergy = 0;
 
 		private final int ENERGY_THRESHOLD = 50;
+
+		public static int maximunPollenReach = 350;
 
 		public Leaf(Plant thisPlant, float tipX, float tipY)
 			{
@@ -60,7 +61,7 @@ public class Leaf extends PlantPart
 
 		public final boolean containsPoint(float x, float y)
 			{
-				return Tools.getVectorLength(this.x, this.y, x, y) < 12.5 ? true : false;
+				return Tools.getVectorLengthSquared(this.x, this.y, x, y) < 156.25 ? true : false;
 			}
 
 		public void containsPhoton(Photon photon)
@@ -79,7 +80,7 @@ public class Leaf extends PlantPart
 		private final Plant findPartner()
 			{
 				Leaf closestLeaf = this;
-				double distanceToLeaf = 200;
+				double distanceToLeaf = maximunPollenReach;
 
 				for (Plant p : hub.world.getPlants())
 					if (p != thisPlant && p.genes.isGeneticallyCompatable(thisPlant))
@@ -87,7 +88,8 @@ public class Leaf extends PlantPart
 							if (Tools.getVectorLength(leaf.x, leaf.y, this.x, this.y) < distanceToLeaf)
 								{
 									closestLeaf = leaf;
-									if (distanceToLeaf < 100 && Tools.randPercent() > 70)
+									distanceToLeaf = Tools.getVectorLength(leaf.x, leaf.y, this.x, this.y);
+									if (Tools.randInt(0, maximunPollenReach / 2) > distanceToLeaf)
 										break;
 								}
 
@@ -112,6 +114,8 @@ public class Leaf extends PlantPart
 							{
 								Plant parentTwo = findPartner();
 								hub.world.addPlant(new Plant(thisPlant, parentTwo, x, y));
+								if (parentTwo == thisPlant)
+									System.out.println("A_SEXUAL");
 								energy -= thisPlant.genes.seedEnergy;
 								seedEnergy = 0;
 							}
@@ -137,12 +141,5 @@ public class Leaf extends PlantPart
 						int seedSize = (int) (seedEnergy / 15);
 						g.fillOval(Math.round(x - (seedSize / 2)), Math.round(y - (seedSize / 2)), seedSize, seedSize);
 					}
-
-				if (hub.DEBUG)
-					if (thisPlant.selected)
-						{
-							g.setColor(Color.BLACK);
-							g.drawString("" + thisPlant.genes.DNA, Math.round(x - 12.5f), Math.round(y - 12.5f));
-						}
 			}
 	}

@@ -304,14 +304,11 @@ public class Tools
 		/**
 		 * This method calculates the vector between two {@link Point}s.
 		 * 
-		 * @param startX
-		 *            - X coordinate of the starting point.
-		 * @param startY
-		 *            - Y coordinate of the starting point.
-		 * @param endX
-		 *            - X coordinate of the end point.
-		 * @param endY
-		 *            - Y coordinate of the end point.
+		 * @param startPoint
+		 *            - The start point of the vector.
+		 * @param endPoint
+		 *            - The end point of the vector.
+		 * 
 		 * @return A {@link Point} Representing the vector between the two
 		 *         points.
 		 */
@@ -327,14 +324,11 @@ public class Tools
 		/**
 		 * This method calculates the vector between two {@link TPoint}s.
 		 * 
-		 * @param startX
-		 *            - X coordinate of the starting point.
-		 * @param startY
-		 *            - Y coordinate of the starting point.
-		 * @param endX
-		 *            - X coordinate of the end point.
-		 * @param endY
-		 *            - Y coordinate of the end point.
+		 * @param startPoint
+		 *            - The start point of the vector.
+		 * @param endPoint
+		 *            - The end point of the vector.
+		 * 
 		 * @return A {@link Point} Representing the vector between the two
 		 *         points.
 		 */
@@ -345,6 +339,55 @@ public class Tools
 				point.setLocation(endPoint.getX() - startPoint.getX(), endPoint.getY() - startPoint.getY());
 
 				return point;
+			}
+
+		/**
+		 * This method calculates the angle of the line between two
+		 * {@link Point}s.
+		 * 
+		 * @param startPoint
+		 *            - The start point of the vector.
+		 * @param endPoint
+		 *            - The end point of the vector.
+		 * 
+		 * @return The angle, in Degrees, of the line betweent the two points
+		 */
+		public static final double getVectorAngle(Point startPoint, Point endPoint)
+			{
+				double oppositeLength = endPoint.x - startPoint.x;
+				double adjacentLength = startPoint.y - endPoint.y;
+
+				double angle = Math.toDegrees(Math.atan2(oppositeLength, adjacentLength));
+
+				if (angle < 0)
+					angle += 360;
+
+				return angle;
+			}
+
+		/**
+		 * This method calculates the angle of the line between two
+		 * {@link TPoint}s.
+		 * 
+		 * @param startPoint
+		 *            - The start point of the vector.
+		 * @param endPoint
+		 *            - The end point of the vector.
+		 * 
+		 * @return A {@link Point} Representing the vector between the two
+		 *         points.
+		 */
+		public static final double getVectorAngle(TPoint startPoint, TPoint endPoint)
+			{
+				double oppositeLength = endPoint.getX() - startPoint.getX();
+				double adjacentLength = startPoint.getY() - endPoint.getY();
+
+				double angle = Math.toDegrees(Math.atan2(oppositeLength, adjacentLength));
+
+				if (angle < 0)
+					angle += 360;
+
+				return angle;
 			}
 
 		/**
@@ -393,6 +436,57 @@ public class Tools
 			{
 
 				return Math.sqrt(Math.pow(start.getY() - end.getY(), 2) + Math.pow(start.getX() - end.getX(), 2));
+			}
+
+		/**
+		 * This method returns the square of the distance between two points.
+		 * This method is faster than <code>the getVectorLength()</code> method.
+		 * 
+		 * @param startX
+		 *            - X coordinate of the starting point.
+		 * @param startY
+		 *            - Y coordinate of the starting point.
+		 * @param endX
+		 *            - X coordinate of the end point.
+		 * @param endY
+		 *            - Y coordinate of the end point.
+		 * @return The distance between the two points as a double.
+		 */
+		public static final double getVectorLengthSquared(double startX, double startY, double endX, double endY)
+			{
+				return Math.pow(startY - endY, 2) + Math.pow(startX - endX, 2);
+			}
+
+		/**
+		 * This method returns the square of the distance between two {@link Point}'s.
+		 * This method is faster than <code>the getVectorLength()</code> method.
+		 * 
+		 * @param start
+		 *            - The first {@link Point}.
+		 * @param end
+		 *            - The second {@link Point}.
+		 * @return The distance between the two points as a double.
+		 */
+		public static final double getVectorLengthSquared(Point start, Point end)
+			{
+
+				return Math.pow(start.getY() - end.getY(), 2) + Math.pow(start.getX() - end.getX(), 2);
+			}
+
+		/**
+		 * This method returns the square of the distance between two {@link TPoint}'s.
+		 * This method is faster than <code>the getVectorLength()</code> method.
+		 * 
+		 * @param start
+		 *            - The first {@link TPoint}.
+		 * @param end
+		 *            - The second {@link TPoint}.
+		 * @return The distance between the two points as a double.
+		 */
+		public static final double getVectorLengthSquared(TPoint start, TPoint end)
+			{
+
+				return Math.pow(start.getY() - end.getY(), 2) + Math.pow(start.getX() - end.getX(), 2);
 			}
 
 		/**

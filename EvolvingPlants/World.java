@@ -23,6 +23,8 @@ public class World extends RenderableObject implements Constants
 	{
 		private static final long serialVersionUID = 1L;
 
+		public static int ticksPerRender = 1;
+
 		private Pixel[][] photonGrid = new Pixel[800][600];
 
 		private ArrayList<Plant> plantsToAdd = new ArrayList<Plant>(20);
@@ -60,6 +62,8 @@ public class World extends RenderableObject implements Constants
 		protected boolean viewDeathAnimation = true;
 		protected boolean viewWind = false;
 
+		private double nextDnaLength = (int) Genes.dnaLength;
+
 		private final TMenu universalMenu = new TMenu(200, 0, 800, 70, TMenu.HORIZONTAL);
 
 		private final TButton viewPhotonsButton = new TButton(0, 0, "View Light?   [" + (viewLight ? "on]" : "off]"));
@@ -69,6 +73,11 @@ public class World extends RenderableObject implements Constants
 		private final TButton reColourAllButton = new TButton(0, 0, "Re-Colour All");
 		private final TButton getMostProliferous = new TButton(0, 0, "Select Most Proliferous");
 		private final TButton resetButton = new TButton(1010, 520, 175, 40, "RESET PLANTS");
+
+		private final TSlider dnaLengthSlider = new TSlider(1010, 290, TSlider.HORIZONTAL, 180);
+		private final TSlider dnaMutabilitySlider = new TSlider(1010, 330, TSlider.HORIZONTAL, 180);
+		private final TSlider speciesDefSlider = new TSlider(1010, 370, TSlider.HORIZONTAL, 180);
+		private final TSlider pollenReachSlider = new TSlider(1010, 410, TSlider.HORIZONTAL, 180);
 
 		// Plant Options
 		private boolean showRelations = false;
@@ -145,6 +154,15 @@ public class World extends RenderableObject implements Constants
 				addTComponent(windSlider);
 				windSlider.setSliderPercent(0, 45);
 				windSlider.setSliderPercent(1, 55);
+				addTComponent(dnaLengthSlider);
+				dnaLengthSlider.setSliderPercent(32);
+				addTComponent(dnaMutabilitySlider);
+				dnaMutabilitySlider.setSliderPercent(35);
+				addTComponent(speciesDefSlider);
+				speciesDefSlider.setSliderPercent(18);
+				addTComponent(pollenReachSlider);
+				pollenReachSlider.setSliderPercent(60);
+				
 
 				// Universal Options
 				addTComponent(universalMenu);
@@ -190,6 +208,11 @@ public class World extends RenderableObject implements Constants
 			{
 				plants.clear();
 				plantsToAdd.clear();
+				selectedPlant = null;
+
+				Genes.dnaLength = nextDnaLength;
+				dnaMutabilitySlider.setSliderPercent(dnaMutabilitySlider.getSliderPercent());
+				speciesDefSlider.setSliderPercent(speciesDefSlider.getSliderPercent());
 
 				// add 10 equally spaced new plants
 				for (int i = 0; i < 10; i++)
@@ -288,10 +311,16 @@ public class World extends RenderableObject implements Constants
 				if (showRelations && selectedPlant != null)
 					{
 						g.setColor(Color.WHITE);
-						g.fillRect(200, 70, 800, 100);
+						g.fillRect(200, 70, 800, 110);
 
 						g.setColor(Color.BLUE);
-						g.drawLine(200, 70 + (Genes.SPECIES_VAR * 3), 1000, 70 + (Genes.SPECIES_VAR * 3));
+						g.drawLine(200, 75 + (int) ((Genes.speciesDef / Genes.dnaLength) * 100), 1000, 75 + (int) ((Genes.speciesDef / Genes.dnaLength) * 100));
+
+						g.setColor(Color.BLACK);
+						for (int i = 0; i < 6; i++)
+							// TODO five numbers to indicate num differences
+							// between individuals
+							g.drawString("" + (int) (Genes.dnaLength * (i * 0.2)), 210, 80 + (i * 20));
 					}
 
 				for (Plant p : plants)
@@ -300,14 +329,14 @@ public class World extends RenderableObject implements Constants
 						if (showRelations && selectedPlant != null && p.seed.germinated)
 							{
 								g.setColor(Color.BLACK);
-								g.drawString("*", Math.round(p.x), 80 + (int) (p.genes.getSpeciesDifference(selectedPlant) / 0.3));
+								g.drawString("*", Math.round(p.x), 80 + (int) ((p.genes.getSpeciesDifference(selectedPlant.genes.DNA) / Genes.dnaLength) * 100));
 							}
 					}
 
 				if (selectedSlider != NONE)
 					{
 						g.setColor(Color.WHITE);
-						g.fillRect(200, 70, 800, 100);
+						g.fillRect(200, 70, 800, 110);
 
 						g.setColor(Color.BLACK);
 						for (Plant p : plants)
@@ -334,6 +363,7 @@ public class World extends RenderableObject implements Constants
 										break;
 									case (SEED_ENERGY):
 										g.drawString("*", Math.round(p.x), 170 - (int) (p.genes.seedEnergy / 5));
+
 										break;
 									case (LEAF_ALPHA):
 										g.drawString("*", Math.round(p.x), 70 + (int) ((255 - p.genes.leafColour.getAlpha()) / 2.55f));
@@ -353,6 +383,10 @@ public class World extends RenderableObject implements Constants
 				g.drawString("Plant Spacing: " + plantSpacing + " | " + plantSpacing2, 1020, 170);
 				g.drawString("Chance of mutation: " + (int) UVIntensity + " | " + (int) UVIntensity2, 1020, 210);
 				g.drawString("Size of mutation: " + (int) UVDamage + " | " + (int) UVDamage2, 1020, 250);
+				g.drawString("DNA Length (must RESET): " + (int) nextDnaLength, 1020, 290);
+				g.drawString("DNA Mutability: " + Genes.dnaMutability, 1020, 330);
+				g.drawString("Species Definition: " + Genes.speciesDef, 1020, 370);
+				g.drawString("Pollen Reach: " + Leaf.maximunPollenReach, 1020, 410);
 
 				g.setColor(Color.BLACK);
 				g.drawString("Selected Plant:", 8, 20);
@@ -684,6 +718,30 @@ public class World extends RenderableObject implements Constants
 		@Override
 		protected void keyPressed(KeyEvent event)
 			{
+				if (event.getKeyChar() == '+')
+					ticksPerRender++;
+				else if (event.getKeyChar() == '-')
+					ticksPerRender--;
+				else if (event.getKeyChar() == '0')
+					ticksPerRender = 0;
+				else if (event.getKeyChar() == '1')
+					ticksPerRender = 1;
+				else if (event.getKeyChar() == '2')
+					ticksPerRender = 2;
+				else if (event.getKeyChar() == '3')
+					ticksPerRender = 3;
+				else if (event.getKeyChar() == '4')
+					ticksPerRender = 4;
+				else if (event.getKeyChar() == '5')
+					ticksPerRender = 5;
+				else if (event.getKeyChar() == '6')
+					ticksPerRender = 6;
+				else if (event.getKeyChar() == '7')
+					ticksPerRender = 7;
+				else if (event.getKeyChar() == '8')
+					ticksPerRender = 8;
+				else if (event.getKeyChar() == '9')
+					ticksPerRender = 9;
 			}
 
 		@Override
@@ -793,6 +851,16 @@ public class World extends RenderableObject implements Constants
 						else if (event.getSource() == UVDamageSlider)
 							UVDamage2 = (float) UVDamageSlider.getSliderPercent(1);
 					}
+
+				else if (event.getSource() == dnaLengthSlider)
+					nextDnaLength = (int) ((dnaLengthSlider.getSliderPercent() * 0.75) + 5);
+				else if (event.getSource() == dnaMutabilitySlider)
+					Genes.dnaMutability = (int) ((dnaMutabilitySlider.getSliderPercent() * 0.49) + 1);
+				else if (event.getSource() == speciesDefSlider)
+					Genes.speciesDef = (int) ((speciesDefSlider.getSliderPercent() * Genes.dnaLength) / 100);
+
+				else if (event.getSource() == pollenReachSlider)
+					Leaf.maximunPollenReach = (int) ((pollenReachSlider.getSliderPercent() * 4.5) + 50);
 
 				// GENES
 				else if (event.getSource() == maxAgeSlider)

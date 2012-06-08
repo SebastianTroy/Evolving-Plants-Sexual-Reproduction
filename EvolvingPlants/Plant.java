@@ -70,6 +70,9 @@ public class Plant extends PlantPart
 			{
 				if (age >= genes.maxAge)
 					{
+						if (seed.germinated)
+							for (Leaf l : leaves)
+								l.exists = false;
 						if (hub.world.viewDeathAnimation)
 							{
 								seed.germinated = false;
