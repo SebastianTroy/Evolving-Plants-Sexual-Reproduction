@@ -35,11 +35,7 @@ public class Seed extends PlantPart
 								y += 2;
 								thisPlant.y += 2;
 
-								double var;
-								if (x < 600)
-									var = (RandTools.getDouble(-xMod, xMod) / 2);
-								else
-									var = (RandTools.getDouble(-xMod, xMod) / 2);
+								double var = (RandTools.getDouble(-xMod, xMod) / 2);
 
 								x += xMod + var;
 								thisPlant.x += xMod + var;

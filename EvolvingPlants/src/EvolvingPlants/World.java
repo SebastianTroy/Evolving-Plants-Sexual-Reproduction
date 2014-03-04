@@ -178,7 +178,6 @@ public class World extends RenderableObject
 				universalMenu.add(reColourSelectButton, true);
 				universalMenu.add(mousePlantButton, true);
 				universalMenu.add(mouseGetGenesButton, true);
-				universalMenu.add(mousePlantButton, true);
 			}
 
 		@Override

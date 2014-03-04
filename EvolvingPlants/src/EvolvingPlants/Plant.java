@@ -83,10 +83,7 @@ public class Plant extends PlantPart
 											if (l.y < 612)
 												{
 													l.y += 1.5;
-													if (l.x < 600)
-														l.x += RandTools.getDouble(-1.75, 1.75);
-													else
-														l.x += RandTools.getDouble(-1.75, 1.75);
+													l.x += RandTools.getDouble(-1.75, 1.75);
 													leavesFallen = false;
 													Main.world.lightUpdateNeeded = true;
 												}
