@@ -1,0 +1,19 @@
+Evolving Plants Sexual Reproduction/bin
+
+Evolving Plants Sexual Reproduction/.settings
+
+Evolving Plants Sexual Reproduction/.classpath
+
+Evolving Plants Sexual Reproduction/.project
+
+
+
+*.class
+
+
+
+# Package Files #
+
+*.war
+
+*.ear
