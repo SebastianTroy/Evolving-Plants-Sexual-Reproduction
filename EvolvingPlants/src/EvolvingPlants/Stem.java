@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 import tools.NumTools;
-import tools.RandTools;
+import tools.Rand;
 
 public class Stem extends PlantPart
 	{
@@ -33,7 +33,7 @@ public class Stem extends PlantPart
 		private final void calculateGrowthPath()
 			{
 				float stemAngleVar = thisPlant.genes.stemAngleVariation;
-				double growAngle = RandTools.getFloat(-stemAngleVar, stemAngleVar);
+				double growAngle = Rand.float_(-stemAngleVar, stemAngleVar);
 
 				double[] growVector = NumTools.getVector(growAngle);
 

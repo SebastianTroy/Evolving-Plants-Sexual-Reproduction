@@ -5,7 +5,7 @@ import java.awt.Graphics;
 import java.util.ArrayList;
 
 import tools.ColTools;
-import tools.RandTools;
+import tools.Rand;
 
 public class Plant extends PlantPart
 	{
@@ -83,7 +83,7 @@ public class Plant extends PlantPart
 											if (l.y < 612)
 												{
 													l.y += 1.5;
-													l.x += RandTools.getDouble(-1.75, 1.75);
+													l.x += Rand.double_(-1.75, 1.75);
 													leavesFallen = false;
 													Main.world.lightUpdateNeeded = true;
 												}

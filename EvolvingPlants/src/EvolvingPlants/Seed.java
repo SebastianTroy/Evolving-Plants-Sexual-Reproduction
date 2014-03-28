@@ -2,7 +2,7 @@ package EvolvingPlants;
 
 import java.awt.Graphics;
 
-import tools.RandTools;
+import tools.Rand;
 
 public class Seed extends PlantPart
 	{
@@ -22,7 +22,7 @@ public class Seed extends PlantPart
 
 				energyPerGrow = thisPlant.genes.energyTransfer * Math.pow(thisPlant.genes.energyTransfer + 0.2, 1.25);
 
-				xMod = RandTools.getDouble(-thisPlant.genes.seedSpread, thisPlant.genes.seedSpread);
+				xMod = Rand.double_(-thisPlant.genes.seedSpread, thisPlant.genes.seedSpread);
 			}
 
 		@Override
@@ -35,7 +35,7 @@ public class Seed extends PlantPart
 								y += 2;
 								thisPlant.y += 2;
 
-								double var = (RandTools.getDouble(-xMod, xMod) / 2);
+								double var = (Rand.double_(-xMod, xMod) / 2);
 
 								x += xMod + var;
 								thisPlant.x += xMod + var;

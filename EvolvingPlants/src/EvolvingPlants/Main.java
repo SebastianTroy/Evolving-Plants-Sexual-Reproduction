@@ -24,18 +24,19 @@ public class Main extends TCode
 				DEBUG = true;
 				FORCE_SINGLE_THREAD = true;
 
-				try
-					{
-						frame.icons.add(ImageIO.read(Main.class.getResource("/assets/taskBar.png")));
-						frame.icons.add(ImageIO.read(Main.class.getResource("/assets/titleBar.png")));
-					}
-				catch (IOException e)
-					{
-						if (!DEBUG)
-							WindowTools.debugWindow("Assets not present");
-						else
-							e.printStackTrace();
-					}
+//				try
+//					{
+//						// TODO add icons for frame
+//						// frame.icons.add(ImageIO.read(Main.class.getResource("/assets/taskBar.png")));
+//						// frame.icons.add(ImageIO.read(Main.class.getResource("/assets/titleBar.png")));
+//					}
+//				catch (IOException e)
+//					{
+//						if (!DEBUG)
+//							WindowTools.debugWindow("Assets not present");
+//						else
+//							e.printStackTrace();
+//					}
 
 				world = new World();
 				begin(world);

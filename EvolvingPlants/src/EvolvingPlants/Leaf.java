@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 import tools.NumTools;
-import tools.RandTools;
+import tools.Rand;
 
 public class Leaf extends PlantPart
 	{
@@ -26,7 +26,7 @@ public class Leaf extends PlantPart
 				this.x = tipX;
 				this.y = tipY;
 
-				willGrowStems = thisPlant.genes.chanceOfGrowingStems > RandTools.randPercent();
+				willGrowStems = thisPlant.genes.chanceOfGrowingStems > Rand.percent();
 
 				thisPlant.leaves.add(this);
 			}
@@ -44,7 +44,7 @@ public class Leaf extends PlantPart
 			{
 				if (willGrowStems)
 					{
-						int numStems = RandTools.getInt(0, (int) Math.min(thisPlant.numberOfStemsLeft, thisPlant.genes.numberOfLeafStems));
+						int numStems = Rand.int_(0, (int) Math.min(thisPlant.numberOfStemsLeft, thisPlant.genes.numberOfLeafStems));
 						if (numStems == 0)
 							{
 								willGrowStems = false;
@@ -78,7 +78,7 @@ public class Leaf extends PlantPart
 								{
 									closestLeaf = leaf;
 									distanceToLeaf = NumTools.distance(leaf.x, leaf.y, this.x, this.y);
-									if (RandTools.getInt(0, maximunPollenReach / 2) > distanceToLeaf)
+									if (Rand.int_(0, maximunPollenReach / 2) > distanceToLeaf)
 										break;
 								}
 

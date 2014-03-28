@@ -3,7 +3,7 @@ package EvolvingPlants;
 import java.awt.Color;
 
 import tools.ColTools;
-import tools.RandTools;
+import tools.Rand;
 
 public class Genes
 	{
@@ -108,7 +108,7 @@ public class Genes
 			{
 				for (int i = 0; i < dnaLength; i++)
 					{
-						char letter = (char) RandTools.getInt(A, D);
+						char letter = (char) Rand.int_(A, D);
 						switch (letter)
 							{
 								case (A):
@@ -129,26 +129,26 @@ public class Genes
 				leafColour = ColTools.randAlphaColour();
 				seedColour = ColTools.randColour();
 
-				maxAge = RandTools.getInt(800, 2800);
+				maxAge = Rand.int_(800, 2800);
 
-				seedEnergy = RandTools.getInt(250, 350);
-				seedSpread = RandTools.getFloat(1.0f, 1.7f);
-				numberOfSeedStems = RandTools.getFloat(1.0f, 2.0f);
+				seedEnergy = Rand.int_(250, 350);
+				seedSpread = Rand.float_(1.0f, 1.7f);
+				numberOfSeedStems = Rand.float_(1.0f, 2.0f);
 
-				maxStems = RandTools.getFloat(1, 4);
-				numberOfLeafStems = RandTools.getFloat(0, 3);
-				chanceOfGrowingStems = (float) RandTools.randPercent();
-				maxStemLength = RandTools.getInt(25, 55);
-				stemAngleVariation = RandTools.getFloat(0, 30);
+				maxStems = Rand.float_(1, 4);
+				numberOfLeafStems = Rand.float_(0, 3);
+				chanceOfGrowingStems = (float) Rand.percent();
+				maxStemLength = Rand.int_(25, 55);
+				stemAngleVariation = Rand.float_(0, 30);
 
-				energyTransfer = RandTools.getDouble(0.01, 3.0);
+				energyTransfer = Rand.double_(0.01, 3.0);
 			}
 
 		private final void mergeParentsDNA(String pOne, String pTwo)
 			{
 				for (int i = 0; i < dnaLength; i++)
 					{
-						char letter = RandTools.getBool() ? pOne.charAt(i) : pTwo.charAt(i);
+						char letter = Rand.bool() ? pOne.charAt(i) : pTwo.charAt(i);
 
 						switch (letter)
 							{
@@ -174,9 +174,9 @@ public class Genes
 
 				for (int i = 0; i < dnaLength; i++)
 					{
-						if (RandTools.randPercent() < RandTools.getDouble(0, var * dnaMutability))
+						if (Rand.percent() < Rand.double_(0, var * dnaMutability))
 							{
-								char letter = (char) RandTools.getInt(A, D);
+								char letter = (char) Rand.int_(A, D);
 
 								switch (letter)
 									{
@@ -232,7 +232,7 @@ public class Genes
 
 				// the more closely related, the more likely they are
 				// compatable.
-				return numDifferences < speciesDef - RandTools.getInt(0, (int) speciesDef);
+				return numDifferences < speciesDef - Rand.int_(0, (int) speciesDef);
 			}
 
 		private final void mutate(Plant thisPlant)
@@ -247,7 +247,7 @@ public class Genes
 						var = thisPlant.x < 600 ? Main.world.UVDamage : Main.world.UVDamage2;
 					}
 
-				if (UVIntensity > RandTools.randPercent())
+				if (UVIntensity > Rand.percent())
 					{
 						var /= 100f;
 
@@ -255,20 +255,20 @@ public class Genes
 
 						mutateDNA(var);
 
-						maxAge += RandTools.getFloat(-var * AGE_VAR, var * AGE_VAR);
+						maxAge += Rand.float_(-var * AGE_VAR, var * AGE_VAR);
 
-						seedEnergy += RandTools.getFloat(-var * SEED_ENERGY_VAR, var * SEED_ENERGY_VAR);
-						seedSpread += RandTools.getFloat(-var * SEED_SPREAD_VAR, var * SEED_SPREAD_VAR);
+						seedEnergy += Rand.float_(-var * SEED_ENERGY_VAR, var * SEED_ENERGY_VAR);
+						seedSpread += Rand.float_(-var * SEED_SPREAD_VAR, var * SEED_SPREAD_VAR);
 
-						numberOfSeedStems += RandTools.getFloat(-var * NUM_SEED_STEM_VAR, var * NUM_SEED_STEM_VAR);
-						numberOfLeafStems += RandTools.getFloat(-var * NUM_LEAF_STEMS_VAR, var * NUM_LEAF_STEMS_VAR);
+						numberOfSeedStems += Rand.float_(-var * NUM_SEED_STEM_VAR, var * NUM_SEED_STEM_VAR);
+						numberOfLeafStems += Rand.float_(-var * NUM_LEAF_STEMS_VAR, var * NUM_LEAF_STEMS_VAR);
 
-						maxStems += RandTools.getFloat(-var * MAX_STEM_VAR, var * MAX_STEM_VAR);
-						chanceOfGrowingStems += RandTools.getFloat(-var * CHANCE_LEAF_HAS_STEMS_VAR, var * CHANCE_LEAF_HAS_STEMS_VAR);
-						maxStemLength += RandTools.getFloat(-var * MAX_STEM_LENGTH_VAR, var * MAX_STEM_LENGTH_VAR);
-						stemAngleVariation += RandTools.getFloat(-var * stamAngleVar, var * stamAngleVar);
+						maxStems += Rand.float_(-var * MAX_STEM_VAR, var * MAX_STEM_VAR);
+						chanceOfGrowingStems += Rand.float_(-var * CHANCE_LEAF_HAS_STEMS_VAR, var * CHANCE_LEAF_HAS_STEMS_VAR);
+						maxStemLength += Rand.float_(-var * MAX_STEM_LENGTH_VAR, var * MAX_STEM_LENGTH_VAR);
+						stemAngleVariation += Rand.float_(-var * stamAngleVar, var * stamAngleVar);
 
-						energyTransfer += RandTools.getDouble(-var * stemGrowSpeedVar, var * stemGrowSpeedVar);
+						energyTransfer += Rand.double_(-var * stemGrowSpeedVar, var * stemGrowSpeedVar);
 					}
 			}
 
@@ -297,18 +297,18 @@ public class Genes
 				if (thisPlant != null)
 					var = thisPlant.x < 600 ? Main.world.UVDamage / 2f : Main.world.UVDamage2 / 2f;
 
-				int alpha = (int) (leafColour.getAlpha() + RandTools.getFloat(-var, var));
-				int red = (int) (leafColour.getRed() + RandTools.getFloat(-var, var));
-				int green = (int) (leafColour.getGreen() + RandTools.getFloat(-var, var));
-				int blue = (int) (leafColour.getBlue() + RandTools.getFloat(-var, var));
+				int alpha = (int) (leafColour.getAlpha() + Rand.float_(-var, var));
+				int red = (int) (leafColour.getRed() + Rand.float_(-var, var));
+				int green = (int) (leafColour.getGreen() + Rand.float_(-var, var));
+				int blue = (int) (leafColour.getBlue() + Rand.float_(-var, var));
 
 				leafColour = ColTools.checkAlphaColour(red, green, blue, alpha);
 
 				var *= 1.5;
 
-				red = (int) (seedColour.getRed() + RandTools.getFloat(-var, var));
-				green = (int) (seedColour.getGreen() + RandTools.getFloat(-var, var));
-				blue = (int) (seedColour.getBlue() + RandTools.getFloat(-var, var));
+				red = (int) (seedColour.getRed() + Rand.float_(-var, var));
+				green = (int) (seedColour.getGreen() + Rand.float_(-var, var));
+				blue = (int) (seedColour.getBlue() + Rand.float_(-var, var));
 
 				seedColour = ColTools.checkColour(red, green, blue);
 			}
