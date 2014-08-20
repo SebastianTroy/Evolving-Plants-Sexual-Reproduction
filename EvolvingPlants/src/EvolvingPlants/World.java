@@ -23,7 +23,7 @@ public class World extends RenderableObject
 	{
 		// Constant variables
 		private static final byte NONE = 0, MAX_AGE = 1, SEED_STEMS = 2, LEAF_STEMS = 3, CHANCE_STEMS = 4, MAX_STEMS = 5, STEM_ANGLE = 6, SEED_ENERGY = 7, LEAF_ALPHA = 8;
-
+		private static final Color BACKGROUND = new Color(150, 150, 255);
 		// Simulation variables
 		private double timePassed = 0, timePerTick = 0.2;
 
@@ -259,7 +259,7 @@ public class World extends RenderableObject
 		@Override
 		public void render(Graphics2D g)
 			{
-				g.setColor(new Color(100, 100, 255));
+				g.setColor(BACKGROUND);
 				g.fillRect(200, 0, 800, 600);
 
 				if (showLight)
@@ -328,7 +328,7 @@ public class World extends RenderableObject
 									}
 					}
 
-				g.setColor(Color.GRAY);
+				g.setColor(Color.LIGHT_GRAY);
 				g.fillRect(0, 0, 200, 600);
 				g.fillRect(1000, 0, 200, 600);
 
